@@ -4,11 +4,12 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/base64"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-create-agent/upload"
+	"github.com/mazgch/arduino-create-agent/upload"
 )
 
 type writeRequest struct {
@@ -287,8 +288,15 @@ func spWrite(arg string) {
 	// include newline or not in the write? that is the question.
 	// for now lets skip the newline
 	//wr.d = []byte(args[2] + "\n")
-	wr.d = args[2] //[]byte(args[2])
 
+	if args[0] == "sendb64" {
+		// decode from base64 to utf8
+		var str []byte
+		str, _ = base64.StdEncoding.DecodeString(args[2])
+		wr.d = string(str)
+	} else {
+		wr.d = args[2] //[]byte(args[2])
+	}
 	// send it to the write channel
 	sh.write <- wr
 }

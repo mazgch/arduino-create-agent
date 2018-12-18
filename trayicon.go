@@ -36,7 +36,7 @@ import (
 	"runtime"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/arduino/arduino-create-agent/icon"
+	"github.com/mazgch/arduino-create-agent/icon"
 	"github.com/getlantern/systray"
 	"github.com/go-ini/ini"
 	"github.com/kardianos/osext"
@@ -102,8 +102,8 @@ func getConfigs() []ConfigIni {
 func setupSysTrayReal() {
 
 	systray.SetIcon(icon.GetIcon())
-	mUrl := systray.AddMenuItem("Go to Arduino Create", "Arduino Create")
-	mDebug := systray.AddMenuItem("Open debug console", "Debug console")
+	mDebug := systray.AddMenuItem("Open u-start", "Evaluate")
+	mUrl := systray.AddMenuItem("Go to u-blox", "Website")
 	menuVer := systray.AddMenuItem("Agent version "+version+"-"+git_revision, "")
 	mPause := systray.AddMenuItem("Pause Plugin", "")
 	var mConfigCheckbox []*systray.MenuItem
@@ -158,7 +158,7 @@ func setupSysTrayReal() {
 		for {
 			<-mDebug.ClickedCh
 			logAction("log on")
-			open.Start("http://127.0.0.1" + port)
+			open.Start("http://localhost")
 		}
 	}()
 
@@ -166,7 +166,7 @@ func setupSysTrayReal() {
 	go func() {
 		for {
 			<-mUrl.ClickedCh
-			open.Start("http://create.arduino.cc")
+			open.Start("https://u-blox.com")
 		}
 	}()
 }

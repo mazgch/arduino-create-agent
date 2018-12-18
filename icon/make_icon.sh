@@ -1,11 +1,11 @@
 #/bin/sh
 
-if [ -z "$GOPATH" ]; then
+if [ -z "/Users/michael/go" ]; then
     echo GOPATH environment variable not set
     exit
 fi
 
-if [ ! -e "$GOPATH/bin/2goarray" ]; then
+if [ ! -e "/Users/michael/go/bin/2goarray" ]; then
     echo "Installing 2goarray..."
     go get github.com/cratonica/2goarray
     if [ $? -ne 0 ]; then
@@ -28,7 +28,7 @@ OUTPUT=iconunix.go
 echo Generating $OUTPUT
 echo "//+build linux darwin" > $OUTPUT
 echo >> $OUTPUT
-cat "$1" | $GOPATH/bin/2goarray Data icon >> $OUTPUT
+cat "$1" | /Users/michael/go/bin/2goarray Data icon >> $OUTPUT
 if [ $? -ne 0 ]; then
     echo Failure generating $OUTPUT
     exit

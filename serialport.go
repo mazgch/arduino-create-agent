@@ -111,31 +111,36 @@ func (p *serport) reader() {
 			break
 		}
 
-		if err == nil {
-			ch = append(buffered_ch.Bytes(), ch[:n]...)
-			n += len(buffered_ch.Bytes())
-			buffered_ch.Reset()
-		}
+        if (p.BufferType != "timedraw") {
+            if err == nil {
+                ch = append(buffered_ch.Bytes(), ch[:n]...)
+                n += len(buffered_ch.Bytes())
+                buffered_ch.Reset()
+            }
+        }
 
 		// read can return legitimate bytes as well as an error
 		// so process the bytes if n > 0
 		if n > 0 {
 			//log.Print("Read " + strconv.Itoa(n) + " bytes ch: " + string(ch))
 
-			data := ""
-
-			for i, w := 0, 0; i < n; i += w {
-				runeValue, width := utf8.DecodeRune(ch[i:n])
-				if runeValue == utf8.RuneError {
-					buffered_ch.Write(append(ch[i:n]))
-					break
-				}
-				if i == n {
-					buffered_ch.Reset()
-				}
-				data += string(runeValue)
-				w = width
-			}
+            data := ""
+            if (p.BufferType != "timedraw") {
+                for i, w := 0, 0; i < n; i += w {
+                    runeValue, width := utf8.DecodeRune(ch[i:n])
+                    if runeValue == utf8.RuneError {
+                        buffered_ch.Write(append(ch[i:n]))
+                        break
+                    }
+                    if i == n {
+                        buffered_ch.Reset()
+                    }
+                    data += string(runeValue)
+                    w = width
+                }
+            } else {
+                data += string(ch[:n])
+            }
 
 			//log.Print("The data i will convert to json is:")
 			//log.Print(data)
@@ -271,7 +276,12 @@ func (p *serport) writerNoBuf() {
 		// WE TRULY/FINALLY GET TO WRITE TO THE SERIAL PORT!
 		n2, err := p.portIo.Write([]byte(data))
 
-		log.Print("Just wrote ", n2, " bytes to serial: ", string(data))
+
+        if (p.BufferType != "timedraw") {
+			log.Print("Just wrote ", n2, " bytes to serial: ", string(data))
+		} else {
+			log.Print("Just wrote ", n2, " bytes to serial:")
+		}
 		if err != nil {
 			errstr := "Error writing to " + p.portConf.Name + " " + err.Error() + " Closing port."
 			log.Print(errstr)

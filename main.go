@@ -18,8 +18,8 @@ import (
 	"github.com/go-ini/ini"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/arduino/arduino-create-agent/tools"
-	"github.com/arduino/arduino-create-agent/utilities"
+	"github.com/mazgch/arduino-create-agent/tools"
+	"github.com/mazgch/arduino-create-agent/utilities"
 	"github.com/gin-gonic/gin"
 	cors "github.com/itsjamie/gin-cors"
 	"github.com/kardianos/osext"
@@ -127,26 +127,29 @@ func loop() {
 		}
 	}
 
-	// Parse ini config
-	args, err := parseIni(filepath.Join(dest, "config.ini"))
-	if err != nil {
-		panic(err)
+	if _, err := os.Stat(filepath.Join(dest, "config.ini")); os.IsExist(err) {
+		// Parse ini config
+		args, err := parseIni(filepath.Join(dest, "config.ini"))
+		if err != nil {
+			panic(err)
+		}
+		err = iniConf.Parse(args)
+		if err != nil {
+			panic(err)
+		}
+		if _, err := os.Stat(filepath.Join(dest, *additionalConfig)); os.IsExist(err) {
+			// Parse additional ini config
+			args, err := parseIni(filepath.Join(dest, *additionalConfig))
+			if err != nil {
+				panic(err)
+			}
+			err = iniConf.Parse(args)
+			if err != nil {
+				panic(err)
+			}
+		}
 	}
-	err = iniConf.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	// Parse additional ini config
-	args, err = parseIni(filepath.Join(dest, *additionalConfig))
-	if err != nil {
-		panic(err)
-	}
-	err = iniConf.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
+	
 	// Instantiate Tools
 	usr, _ := user.Current()
 	directory := filepath.Join(usr.HomeDir, ".arduino-create")
@@ -252,6 +255,7 @@ func loop() {
 	socketHandler := wsHandler().ServeHTTP
 
 	extraOrigins := []string{
+		"http://localhost",
 		"https://create.arduino.cc",
 		"http://create.arduino.cc", "https://create-dev.arduino.cc", "http://create-dev.arduino.cc", "https://create-intel.arduino.cc", "http://create-intel.arduino.cc",
 	}

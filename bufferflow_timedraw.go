@@ -29,7 +29,7 @@ func (b *BufferflowTimedRaw) Init() {
 	}()
 
 	go func() {
-		b.ticker = time.NewTicker(16 * time.Millisecond)
+		b.ticker = time.NewTicker(100 * time.Millisecond)
 		for _ = range b.ticker.C {
 			if len(bufferedOutputRaw) != 0 {
 				m := SpPortMessageRaw{bufferedOutputRaw}
