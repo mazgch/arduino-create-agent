@@ -12,6 +12,7 @@ type BufferflowTimedRaw struct {
 	Port   string
 	Output chan []byte
 	Input  chan string
+	done   chan bool
 	ticker *time.Ticker
 }
 
@@ -20,28 +21,35 @@ var (
 )
 
 func (b *BufferflowTimedRaw) Init() {
-	log.Println("Initting timed buffer flow (output once every 16ms)")
-
-	go func() {
-		for data := range b.Input {
-			bufferedOutputRaw = append(bufferedOutputRaw, []byte(data)...)
-		}
-	}()
+	log.Println("Initting timed buffer flow (output once every 100ms)")
+	bufferedOutputRaw = nil
 
 	go func() {
 		b.ticker = time.NewTicker(100 * time.Millisecond)
-		for _ = range b.ticker.C {
-			if len(bufferedOutputRaw) != 0 {
-				m := SpPortMessageRaw{bufferedOutputRaw}
-				buf, _ := json.Marshal(m)
-				// data is now encoded in base64 format
-				// need a decoder on the other side
-				b.Output <- []byte(buf)
-				bufferedOutputRaw = nil
+		b.done = make(chan bool)
+	Loop:
+		for {
+			select {
+			case data := <-b.Input:
+				bufferedOutputRaw = append(bufferedOutputRaw, []byte(data)...)
+			case <-b.ticker.C:
+				if len(bufferedOutputRaw) != 0 {
+					m := SpPortMessageRaw{bufferedOutputRaw}
+					buf, _ := json.Marshal(m)
+					// data is now encoded in base64 format
+					// need a decoder on the other side
+					b.Output <- []byte(buf)
+					bufferedOutputRaw = nil
+				}
+			case <-b.done:
+				break Loop
 			}
 		}
-	}()
 
+		close(b.Input)
+		close(b.done)
+
+	}()
 }
 
 func (b *BufferflowTimedRaw) BlockUntilReady(cmd string, id string) (bool, bool) {
@@ -98,5 +106,5 @@ func (b *BufferflowTimedRaw) IsBufferGloballySendingBackIncomingData() bool {
 
 func (b *BufferflowTimedRaw) Close() {
 	b.ticker.Stop()
-	close(b.Input)
+	b.done <- true
 }

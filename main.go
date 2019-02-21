@@ -255,7 +255,8 @@ func loop() {
 	socketHandler := wsHandler().ServeHTTP
 
 	extraOrigins := []string{
-		"http://localhost",
+		"http://localhost", "http://localhost:80", "http://localhost:8080", // local host apache
+		"https://www.u-blox.com", "https://u-blox.com.dev.dev1.compact.amazee.io", "https://u-blox.com.docker.amazee.io", 	// production / live / docker
 		"https://create.arduino.cc",
 		"http://create.arduino.cc", "https://create-dev.arduino.cc", "http://create-dev.arduino.cc", "https://create-intel.arduino.cc", "http://create-intel.arduino.cc",
 	}
@@ -412,8 +413,8 @@ body {
     margin: 0;
     width: 100%;
     height: 100%;
-    background: #00979d;
-    font-family: 'Lucida Grande', Lucida, Verdana, sans-serif;
+    background: #c0c0c0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
 
 #log {

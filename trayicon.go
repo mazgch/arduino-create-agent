@@ -158,7 +158,7 @@ func setupSysTrayReal() {
 		for {
 			<-mDebug.ClickedCh
 			logAction("log on")
-			open.Start("http://localhost")
+			open.Start("https://www.u-blox.com/u-start")
 		}
 	}()
 
