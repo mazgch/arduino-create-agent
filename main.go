@@ -256,7 +256,7 @@ func loop() {
 
 	extraOrigins := []string{
 		"http://localhost", "http://localhost:80", "http://localhost:8080", // local host apache
-		"https://www.u-blox.com", "https://u-blox.com.dev.dev1.compact.amazee.io", "https://u-blox.com.docker.amazee.io", 	// production / live / docker
+		"https://www.u-blox.com", 
 		"https://create.arduino.cc",
 		"http://create.arduino.cc", "https://create-dev.arduino.cc", "http://create-dev.arduino.cc", "https://create-intel.arduino.cc", "http://create-intel.arduino.cc",
 	}
